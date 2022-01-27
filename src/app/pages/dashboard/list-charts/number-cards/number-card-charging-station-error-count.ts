@@ -9,37 +9,35 @@ import { NumberCardBaseComponent } from './number-card-base.component';
 export class ChargingStationErrorCardComponent extends NumberCardBaseComponent {
 
   public constructor(
-    centralServerService: CentralServerService,
-    authorizationService: AuthorizationService,
-    filterParams: FilterParams = {}
+    private centralServerService: CentralServerService,
+    private authorizationService: AuthorizationService,
+    private filterParams: FilterParams = {}
   ){
-    super();
-    if (authorizationService.canAccess(Entity.CHARGING_STATION, Action.LIST)){
-      centralServerService.getChargingStationsInError(filterParams).subscribe((chargers) => {
-        let cardType: CardTypes;
+    super(30000);
+    this.details = {
+      display: true,
+      title: 'Charging Stations in Error',
+      icon: 'ev_station',
+      description: '...',
+      type: CardTypes.PRIMARY,
+      details: []
+    }
+  }
+
+  protected fetchDetails(): void {
+    if (this.authorizationService.canAccess(Entity.CHARGING_STATION, Action.LIST)){
+      this.centralServerService.getChargingStationsInError(this.filterParams).subscribe((chargers) => {
         if (chargers.count > 0) {
-          cardType = CardTypes.DANGER;
+          this.details.type = CardTypes.DANGER;
         } else if (chargers.count === 0) {
-          cardType = CardTypes.SUCCESS;
+          this.details.type = CardTypes.SUCCESS;
         }
-        super.setDetails({
-          display: true,
-          title: 'Charging stations in error',
-          description: chargers.count.toString(),
-          icon: 'ev_station',
-          type: cardType,
-          details: chargers.result
-        });
+        this.details.description = chargers.count.toString();
+        this.details.details = chargers.result;
       }, (error) => {
-        super.setDetails({
-          display: false,
-          title: 'Charging stations in error',
-          description:  'err',
-          icon:  'ev_station',
-          type:  CardTypes.PRIMARY,
-          details: []
-        });
+        this.details.description = 'err';
       });
     }
+
   }
 }

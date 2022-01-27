@@ -1,21 +1,26 @@
-import { CardTypes, NumberCard } from 'types/Dashboard';
+import { NumberCard } from 'types/Dashboard';
 
-export class NumberCardBaseComponent {
-  public details: NumberCard;
+export abstract class NumberCardBaseComponent {
+  protected details: NumberCard;
 
-  public constructor() {
+  private ongoingFetch: boolean;
+  private timeoutId: any;
+
+  public constructor(
+    private refreshTimeInMilliSeconds: number
+  ) {
     this.details = {
       display: false,
       title: '',
       description: '',
       icon: 'info'
     };
+    this.ongoingFetch = false;
+    this.timeoutId = setTimeout(() => {
+      this.fetchDetails();
+    }, refreshTimeInMilliSeconds);
   }
 
-  public setDetails(
-    cardDetails: NumberCard,
-  ){
-    Object.assign(this.details, cardDetails);
-  }
+  protected abstract fetchDetails(): void;
 
 }
