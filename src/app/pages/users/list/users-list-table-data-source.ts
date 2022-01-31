@@ -4,12 +4,8 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
 import { ImportDialogComponent } from 'shared/dialogs/import/import-dialog.component';
-import { IssuerFilter, organizations } from 'shared/filters/filter/issuer-filter';
-import { SiteTableFilter } from 'shared/filters/filter/site-table-filter';
-import { TagTableFilter } from 'shared/filters/filter/tag-table-filter';
 import { TableImportUsersAction, TableImportUsersActionDef } from 'shared/table/actions/users/table-import-users-action';
 import { AuthorizationDefinitionFieldMetadata } from 'types/Authorization';
-import { FilterDef } from 'types/Filters';
 import { TagButtonAction } from 'types/Tag';
 
 import { AuthorizationService } from '../../../services/authorization.service';
@@ -19,6 +15,9 @@ import { DialogService } from '../../../services/dialog.service';
 import { MessageService } from '../../../services/message.service';
 import { SpinnerService } from '../../../services/spinner.service';
 import { WindowService } from '../../../services/window.service';
+import { IssuerFilter, organizations } from '../../../shared/filters/filter/issuer-filter';
+import { SiteTableFilter } from '../../../shared/filters/filter/site-table-filter';
+import { TagTableFilter } from '../../../shared/filters/filter/tag-table-filter';
 import { AppDatePipe } from '../../../shared/formatters/app-date.pipe';
 import { TableAutoRefreshAction } from '../../../shared/table/actions/table-auto-refresh-action';
 import { TableMoreAction } from '../../../shared/table/actions/table-more-action';
@@ -32,10 +31,10 @@ import { TableDeleteUserAction, TableDeleteUserActionDef } from '../../../shared
 import { TableEditUserAction, TableEditUserActionDef } from '../../../shared/table/actions/users/table-edit-user-action';
 import { TableExportUsersAction, TableExportUsersActionDef } from '../../../shared/table/actions/users/table-export-users-action';
 import { TableForceSyncBillingUserAction } from '../../../shared/table/actions/users/table-force-sync-billing-user-action';
-import { TableSyncBillingUsersAction } from '../../../shared/table/actions/users/table-sync-billing-users-action';
 import { TableDataSource } from '../../../shared/table/table-data-source';
 import { BillingButtonAction } from '../../../types/Billing';
 import { DataResult } from '../../../types/DataResult';
+import { FilterDef } from '../../../types/Filters';
 import { TableActionDef, TableColumnDef, TableDef } from '../../../types/Table';
 import { TenantComponents } from '../../../types/Tenant';
 import { TransactionButtonAction } from '../../../types/Transaction';
@@ -62,7 +61,6 @@ export class UsersListTableDataSource extends TableDataSource<User> {
   private exportAction = new TableExportUsersAction().getActionDef();
   private importAction = new TableImportUsersAction().getActionDef();
   private createAction = new TableCreateUserAction().getActionDef();
-  private synchronizeBillingUsersAction = new TableSyncBillingUsersAction().getActionDef();
 
   public constructor(
     public spinnerService: SpinnerService,
@@ -118,7 +116,6 @@ export class UsersListTableDataSource extends TableDataSource<User> {
         this.createAction.visible = users.canCreate;
         this.importAction.visible = users.canImport;
         this.exportAction.visible = users.canExport;
-        this.synchronizeBillingUsersAction.visible = users.canSynchronizeBilling;
         observer.next(users);
         observer.complete();
       }, (error) => {
@@ -258,7 +255,6 @@ export class UsersListTableDataSource extends TableDataSource<User> {
       this.createAction,
       this.importAction,
       this.exportAction,
-      this.synchronizeBillingUsersAction,
       ...tableActionsDef,
     ];
   }
@@ -328,14 +324,6 @@ export class UsersListTableDataSource extends TableDataSource<User> {
       case UserButtonAction.IMPORT_USERS:
         if (actionDef.action) {
           (actionDef as TableImportUsersActionDef).action(ImportDialogComponent, this.dialog);
-        }
-        break;
-      case BillingButtonAction.SYNCHRONIZE_BILLING_USERS:
-        if (this.synchronizeBillingUsersAction.action) {
-          this.synchronizeBillingUsersAction.action(
-            this.dialogService, this.translateService, this.messageService,
-            this.centralServerService, this.router,
-          );
         }
         break;
     }

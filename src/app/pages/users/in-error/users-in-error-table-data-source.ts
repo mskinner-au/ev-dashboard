@@ -19,7 +19,6 @@ import { TableAssignSitesToUserAction, TableAssignSitesToUserActionDef } from '.
 import { TableDeleteUserAction, TableDeleteUserActionDef } from '../../../shared/table/actions/users/table-delete-user-action';
 import { TableEditUserAction, TableEditUserActionDef } from '../../../shared/table/actions/users/table-edit-user-action';
 import { TableForceSyncBillingUserAction } from '../../../shared/table/actions/users/table-force-sync-billing-user-action';
-import { TableSyncBillingUserAction } from '../../../shared/table/actions/users/table-sync-billing-user-action';
 import { TableDataSource } from '../../../shared/table/table-data-source';
 import { DataResult } from '../../../types/DataResult';
 import { ErrorMessage, UserInError, UserInErrorType } from '../../../types/InError';
@@ -38,7 +37,6 @@ export class UsersInErrorTableDataSource extends TableDataSource<User> {
   private editAction = new TableEditUserAction().getActionDef();
   private assignSitesToUser = new TableAssignSitesToUserAction().getActionDef();
   private deleteAction = new TableDeleteUserAction().getActionDef();
-  private syncBillingUserAction = new TableSyncBillingUserAction().getActionDef();
   private forceSyncBillingUserAction = new TableForceSyncBillingUserAction().getActionDef();
 
   public constructor(
@@ -157,8 +155,6 @@ export class UsersInErrorTableDataSource extends TableDataSource<User> {
     if (this.componentService.isActive(TenantComponents.BILLING)) {
       if (user.errorCode === UserInErrorType.FAILED_BILLING_SYNCHRO) {
         moreActions.addActionInMoreActions(this.forceSyncBillingUserAction);
-      } else if (user.errorCode === UserInErrorType.NO_BILLING_DATA) {
-        moreActions.addActionInMoreActions(this.syncBillingUserAction);
       }
     }
     moreActions.addActionInMoreActions(this.deleteAction);
@@ -194,14 +190,6 @@ export class UsersInErrorTableDataSource extends TableDataSource<User> {
           );
         }
         break;
-      case UserButtonAction.SYNCHRONIZE_BILLING_USER:
-        if (this.syncBillingUserAction.action) {
-          this.syncBillingUserAction.action(
-            user, this.dialogService, this.translateService, this.spinnerService,
-            this.messageService, this.centralServerService, this.router, this.refreshData.bind(this)
-          );
-        }
-        break;
     }
   }
 
@@ -231,10 +219,6 @@ export class UsersInErrorTableDataSource extends TableDataSource<User> {
       errorTypes.push({
         key: UserInErrorType.FAILED_BILLING_SYNCHRO,
         value: this.translateService.instant(`users.errors.${UserInErrorType.FAILED_BILLING_SYNCHRO}.title`),
-      });
-      errorTypes.push({
-        key: UserInErrorType.NO_BILLING_DATA,
-        value: this.translateService.instant(`users.errors.${UserInErrorType.NO_BILLING_DATA}.title`),
       });
     }
     // Sort
