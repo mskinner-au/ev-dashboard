@@ -1,6 +1,5 @@
-import { BaseFilter } from 'shared/filters/filter/base-filter';
-import { FilterDef, FilterType } from 'types/Filters';
-
+import { BaseFilter } from '../../../shared/filters/filter/base-filter';
+import { FilterDef, FilterType } from '../../../types/Filters';
 import { KeyValue } from '../../../types/GlobalType';
 
 export class UserFreeAccessFilter extends BaseFilter {
