@@ -6,8 +6,8 @@ $min-contrast-ratio: 2.5;
 @include mat-core();
 // Light Theme ---------------------------------
 // Define colors with mat palette
-$app-primary: mat-palette($mat-green, 700);
-$app-accent: mat-palette($mat-green, 500);
+$app-primary: mat-palette($mat-teal, 700);
+$app-accent: mat-palette($mat-teal, 500);
 $app-danger: mat-palette($mat-red, 700);
 // Create the theme for materials
 $app-theme: mat-light-theme($app-primary, $app-accent, $app-danger);
